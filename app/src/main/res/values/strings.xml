@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Popular Movies App Stage</string>
+    <string name="API_KEY">d87ff2eeb96afff48b1570500e022fa2</string>
+    <string name="release_date">Release date: </string>
+    <string name="rating">Rating: </string>
+    <string name="trailers">Trailers: </string>
+</resources>
