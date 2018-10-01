@@ -16,7 +16,7 @@ import java.util.Scanner;
 
 import static android.content.ContentValues.TAG;
 
-public class NetworkUtils extends AppCompatActivity{
+public class NetworkUtils extends AppCompatActivity {
 
     public static URL buildUrl(String urlString) {
         Uri builtUri = Uri.parse(urlString);
@@ -28,6 +28,41 @@ public class NetworkUtils extends AppCompatActivity{
         }
         return url;
     }
+
+    public static URL buildTrailerUrl(String id) {
+
+        Uri builtUri = Uri.parse(Constant.BASE_URL).buildUpon()
+                .appendPath(Constant.MOVIE)
+                .appendPath(id)
+                .appendPath(Constant.VIDEOS)
+                .appendQueryParameter(Constant.API_KEY1,Constant.apiKey)
+                .build();
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+
+    public static URL buildReviewUrl(String id) {
+
+        Uri builtUri = Uri.parse(Constant.BASE_URL).buildUpon()
+                .appendPath(Constant.MOVIE)
+                .appendPath(id)
+                .appendPath(Constant.REVIEWS)
+                .build();
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+
+
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
@@ -47,7 +82,7 @@ public class NetworkUtils extends AppCompatActivity{
         }
     }
 
-    public  boolean isOnline() {
+    public boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnected();

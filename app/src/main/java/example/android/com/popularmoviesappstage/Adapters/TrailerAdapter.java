@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView;
@@ -37,18 +38,19 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
 
     @Override
     public void onBindViewHolder(@NonNull TrailerViewHolder holder, final int position) {
-        holder.youTubePlayerView.initialize(new YouTubePlayerInitListener() {
-            @Override
-            public void onInitSuccess(@NonNull final YouTubePlayer youTubePlayer) {
-                youTubePlayer.addListener(new AbstractYouTubePlayerListener() {
-                    @Override
-                    public void onReady() {
-                        super.onReady();
-                        youTubePlayer.loadVideo(stringList.get(position),0);
-                    }
-                });
-            }
-        },true);
+        holder.trailer_text.append(" " +(position + 1));
+//        holder.youTubePlayerView.initialize(new YouTubePlayerInitListener() {
+//            @Override
+//            public void onInitSuccess(@NonNull final YouTubePlayer youTubePlayer) {
+//                youTubePlayer.addListener(new AbstractYouTubePlayerListener() {
+//                    @Override
+//                    public void onReady() {
+//                        super.onReady();
+//                        youTubePlayer.loadVideo(stringList.get(position),0);
+//                    }
+//                });
+//            }
+//        },true);
     }
 
     @Override
@@ -58,11 +60,11 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
 
     public class TrailerViewHolder extends RecyclerView.ViewHolder {
 
-        YouTubePlayerView youTubePlayerView;
+        TextView trailer_text;
 
         public TrailerViewHolder(View itemView) {
             super(itemView);
-            youTubePlayerView = itemView.findViewById(R.id.trailer_item);
+            trailer_text = itemView.findViewById(R.id.trailer_text);
         }
     }
 

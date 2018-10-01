@@ -1,12 +1,18 @@
 package example.android.com.popularmoviesappstage.Utils;
 
-import example.android.com.popularmoviesappstage.BuildConfig;
+//import example.android.com.popularmoviesappstage.BuildConfig;
 
 public interface Constant {
 
-    String apiKey = BuildConfig.ApiKey;
+//    String apiKey = BuildConfig.ApiKey;
+public static final String apiKey = "d87ff2eeb96afff48b1570500e022fa2";
     final String BASE_URL = "https://api.themoviedb.org/3/";
     final String API_KEY = "?api_key=" + apiKey;
+//    public static final String API_VERSION = "3";
+    public static final String API_KEY1 = "api_key";
+    public static final String VIDEOS = "videos";
+    public static final String MOVIE = "movie";
+    public static final String REVIEWS = "reviews";
 
     // ------------------ Sort APIs ---------------------------
 
