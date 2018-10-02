@@ -5,4 +5,7 @@
     <string name="rating">Rating: </string>
     <string name="trailers">Trailers: </string>
     <string name="trailer">Trailer</string>
+    <string name="fav">Favourite</string>
+    <string name="highestSort">sort by highest rate</string>
+    <string name="popularSort">sort by popular</string>
 </resources>

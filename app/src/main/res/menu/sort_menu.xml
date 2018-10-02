@@ -4,12 +4,17 @@
 
     <item
         android:id="@+id/popular_sort"
-        android:title="sort by popular"
+        android:title="@string/popularSort"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/highestRate_sort"
-        android:title="sort by highest rate"
+        android:title="@string/highestSort"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/favourite"
+        android:title="@string/fav"
         app:showAsAction="never" />
 
 </menu>

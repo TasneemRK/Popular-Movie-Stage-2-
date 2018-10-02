@@ -43,18 +43,6 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
     @Override
     public void onBindViewHolder(@NonNull TrailerViewHolder holder, final int position) {
         holder.trailer_text.append(" " +(position + 1));
-//        holder.youTubePlayerView.initialize(new YouTubePlayerInitListener() {
-//            @Override
-//            public void onInitSuccess(@NonNull final YouTubePlayer youTubePlayer) {
-//                youTubePlayer.addListener(new AbstractYouTubePlayerListener() {
-//                    @Override
-//                    public void onReady() {
-//                        super.onReady();
-//                        youTubePlayer.loadVideo(stringList.get(position),0);
-//                    }
-//                });
-//            }
-//        },true);
     }
 
     @Override

@@ -92,7 +92,8 @@ public class MainActivity extends NetworkUtils implements MoviesAdapter.RecycleI
                     Toast.makeText(this, "you are not connected to the internet.", Toast.LENGTH_SHORT).show();
                 }
                 break;
-
+            case R.id.favourite:
+                break;
         }
         return true;
     }
@@ -165,7 +166,7 @@ public class MainActivity extends NetworkUtils implements MoviesAdapter.RecycleI
         @Override
         public void onItemClickListener(int clickIndex) {
             Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-            intent.putExtra(MOVIE_OBJECT,movies.get(clickIndex));
+            intent.putExtra(MOVIE_OBJECT, movies.get(clickIndex));
             startActivity(intent);
         }
     }
