@@ -1,12 +1,15 @@
 package example.android.com.popularmoviesappstage.Activites;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -28,13 +31,16 @@ public class FavouriteActivity extends AppCompatActivity implements MoviesAdapte
 
         ButterKnife.bind(this);
 
-        MovieViewModel viewModel = new MovieViewModel(getApplication());
-        LiveData<List<Movie>> movies = viewModel.getAllFavMovies();
-        List<Movie> movieList = movies.getValue();
 
-        recyclerView.setLayoutManager(new GridLayoutManager(this,2));
-        MoviesAdapter adapter = new MoviesAdapter(this,movieList,this);
-        recyclerView.setAdapter(adapter);
+        MovieViewModel movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+
+        LiveData<List<Movie>> movies = movieViewModel.getAllFavMovies();
+//        List<Movie> movieList = movies.getValue();
+//        Log.d("listlisd",movies.getValue().get(0).toString());
+
+//        recyclerView.setLayoutManager(new GridLayoutManager(this,2));
+//        MoviesAdapter adapter = new MoviesAdapter(this,movieList,this);
+//        recyclerView.setAdapter(adapter);
 
     }
 

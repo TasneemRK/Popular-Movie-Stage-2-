@@ -3,6 +3,8 @@ package example.android.com.popularmoviesappstage.AND_Arch_Comp_Database;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 

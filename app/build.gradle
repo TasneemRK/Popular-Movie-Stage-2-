@@ -45,4 +45,9 @@ dependencies {
 
     implementation 'android.arch.lifecycle:livedata:1.1.1'
 
+    // ViewModel and LiveData
+    implementation "android.arch.lifecycle:extensions:$room_version"
+    // alternatively - just ViewModel
+    implementation "android.arch.lifecycle:viewmodel:$room_version" // use -ktx for Kotlin
+
 }
