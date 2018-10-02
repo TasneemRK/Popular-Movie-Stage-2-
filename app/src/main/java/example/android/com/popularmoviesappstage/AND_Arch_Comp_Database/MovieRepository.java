@@ -2,6 +2,7 @@ package example.android.com.popularmoviesappstage.AND_Arch_Comp_Database;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
+import android.database.Cursor;
 import android.os.AsyncTask;
 
 import java.util.List;
@@ -27,8 +28,8 @@ public class MovieRepository {
         new AddToFavAsyncTask(movieDao).execute(movie);
     }
 
-    public void deleteFromFav(int movie_id) {
-        new RemoveFavAsyncTask(movieDao).execute(movie_id);
+    public void deleteFromFav(Movie movie) {
+        new RemoveFavAsyncTask(movieDao).execute(movie);
     }
 
     public void deleteAll() {
@@ -52,7 +53,7 @@ public class MovieRepository {
         }
     }
 
-    private static class RemoveFavAsyncTask extends AsyncTask<Integer, Void, Void> {
+    private static class RemoveFavAsyncTask extends AsyncTask<Movie, Void, Void> {
 
         private MovieDao movieDao;
 
@@ -62,8 +63,8 @@ public class MovieRepository {
 
 
         @Override
-        protected Void doInBackground(Integer... integers) {
-            movieDao.deleteFromFav(integers[0]);
+        protected Void doInBackground(Movie... movies) {
+            movieDao.deleteFromFav(movies[0]);
             return null;
         }
     }

@@ -17,7 +17,7 @@ public interface MovieDao {
     void addToFav(Movie movie);
 
     @Delete
-    void deleteFromFav(int movie_id);
+    void deleteFromFav(Movie movie);
 
     @Query("Delete from favourite_table")
     void deleteAllFav();

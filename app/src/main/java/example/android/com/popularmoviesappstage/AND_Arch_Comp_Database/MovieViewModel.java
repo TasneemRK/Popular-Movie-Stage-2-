@@ -3,6 +3,7 @@ package example.android.com.popularmoviesappstage.AND_Arch_Comp_Database;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 
 import java.util.List;
@@ -28,8 +29,8 @@ public class MovieViewModel extends AndroidViewModel {
         movieRepository.addToFav(movie);
     }
 
-    public void removeFromFav(int movie_id){
-        movieRepository.deleteFromFav(movie_id);
+    public void removeFromFav(Movie movie){
+        movieRepository.deleteFromFav(movie);
     }
 
     public void deleteAll(){

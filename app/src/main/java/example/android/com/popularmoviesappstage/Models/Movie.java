@@ -1,18 +1,26 @@
 package example.android.com.popularmoviesappstage.Models;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-
+@Entity
 public class Movie implements Parcelable {
 
+    @PrimaryKey
+    @ColumnInfo(name = "movie_id")
     private int id;
+    @ColumnInfo(name = "movie_Original_title")
     private String Original_title;
+    @ColumnInfo(name = "movie_Overview")
     private String Overview;
+    @ColumnInfo(name = "movie_image")
     private String image;
+    @ColumnInfo(name = "movie_rating")
     private String rating;
+    @ColumnInfo(name = "movie_release_date")
     private String release_date;
 
     public Movie() {
