@@ -27,8 +27,8 @@ public class MovieRepository {
         new AddToFavAsyncTask(movieDao).execute(movie);
     }
 
-    public void deleteFromFav(Movie movie) {
-        new RemoveFavAsyncTask(movieDao).execute(movie);
+    public void deleteFromFav(int movie_id) {
+        new RemoveFavAsyncTask(movieDao).execute(movie_id);
     }
 
     public void deleteAll() {
@@ -52,7 +52,7 @@ public class MovieRepository {
         }
     }
 
-    private static class RemoveFavAsyncTask extends AsyncTask<Movie, Void, Void> {
+    private static class RemoveFavAsyncTask extends AsyncTask<Integer, Void, Void> {
 
         private MovieDao movieDao;
 
@@ -60,9 +60,10 @@ public class MovieRepository {
             this.movieDao = movieDao;
         }
 
+
         @Override
-        protected Void doInBackground(Movie... movies) {
-            movieDao.deleteFromFav(movies[0]);
+        protected Void doInBackground(Integer... integers) {
+            movieDao.deleteFromFav(integers[0]);
             return null;
         }
     }

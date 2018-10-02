@@ -93,6 +93,8 @@ public class MainActivity extends NetworkUtils implements MoviesAdapter.RecycleI
                 }
                 break;
             case R.id.favourite:
+                Intent intent = new Intent(this,FavouriteActivity.class);
+                startActivity(intent);
                 break;
         }
         return true;

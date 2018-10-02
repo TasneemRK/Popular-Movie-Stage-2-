@@ -6,11 +6,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-@Entity(tableName = "Movie_table")
 public class Movie implements Parcelable {
 
-    @PrimaryKey
-    @NonNull
     private int id;
     private String Original_title;
     private String Overview;
@@ -21,6 +18,14 @@ public class Movie implements Parcelable {
     public Movie() {
     }
 
+    public Movie(int id, String original_title, String overview, String image, String rating, String release_date) {
+        this.id = id;
+        Original_title = original_title;
+        Overview = overview;
+        this.image = image;
+        this.rating = rating;
+        this.release_date = release_date;
+    }
 
     public Movie(String original_title, String overview, String image, String rating, String release_date) {
         this.Original_title = original_title;

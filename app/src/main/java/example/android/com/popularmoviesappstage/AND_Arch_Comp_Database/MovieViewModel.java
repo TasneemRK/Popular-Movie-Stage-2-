@@ -20,7 +20,7 @@ public class MovieViewModel extends AndroidViewModel {
         allFavMovies = movieRepository.getAllFavMovies();
     }
 
-    LiveData<List<Movie>> getAllFavMovies(){
+    public LiveData<List<Movie>> getAllFavMovies(){
         return allFavMovies;
     }
 
@@ -28,8 +28,8 @@ public class MovieViewModel extends AndroidViewModel {
         movieRepository.addToFav(movie);
     }
 
-    public void removeFromFav(Movie movie){
-        movieRepository.deleteFromFav(movie);
+    public void removeFromFav(int movie_id){
+        movieRepository.deleteFromFav(movie_id);
     }
 
     public void deleteAll(){
