@@ -1,15 +1,23 @@
 package example.android.com.popularmoviesappstage.Activites;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer;
+import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView;
+import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.AbstractYouTubePlayerListener;
+import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.YouTubePlayerInitListener;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -29,7 +37,7 @@ import example.android.com.popularmoviesappstage.Utils.AsyncTasks;
 import example.android.com.popularmoviesappstage.Utils.NetworkUtils;
 
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends NetworkUtils implements TrailerAdapter.TrailerClickListener {
 
     public static final String RESULTS = "results";
 
@@ -59,7 +67,7 @@ public class DetailsActivity extends AppCompatActivity {
         list = new ArrayList<>();
 
         trailer_recycle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        adapter = new TrailerAdapter(this, list);
+        adapter = new TrailerAdapter(this, list,this);
         trailer_recycle.setAdapter(adapter);
 
         Intent intent = getIntent();
@@ -71,14 +79,21 @@ public class DetailsActivity extends AppCompatActivity {
             date.append(movie.getRelease_date());
             rating.append(movie.getRating());
             int id = movie.getId();
-            new TrailerAsyncTask().execute(id + "");
-            Log.d("listlist",list.toString());
+            if(isOnline()){
+                new TrailerAsyncTask().execute(id + "");
+            }else {
+                Toast.makeText(this, "check internet connection", Toast.LENGTH_SHORT).show();
+            }
         }
 
     }
 
+    @Override
+    public void trailerOnClick(int position) {
+    }
 
-    public  class TrailerAsyncTask extends AsyncTask<String, Void, List<String>> {
+
+    public  class TrailerAsyncTask extends AsyncTask<String, Void, List<String>> implements TrailerAdapter.TrailerClickListener {
 
         List<String> list = new ArrayList<>();
 
@@ -108,8 +123,31 @@ public class DetailsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<String> strings) {
             super.onPostExecute(strings);
-            adapter = new TrailerAdapter(DetailsActivity.this, strings);
+            adapter = new TrailerAdapter(DetailsActivity.this, strings,this);
             trailer_recycle.setAdapter(adapter);
+        }
+
+        @Override
+        public void trailerOnClick(final int position) {
+            Dialog dialog = new Dialog(DetailsActivity.this);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.youtube_player);
+            dialog.setCancelable(true);
+            dialog.show();
+
+            YouTubePlayerView youTubePlayerView = dialog.findViewById(R.id.youtube_player);
+            youTubePlayerView.initialize(new YouTubePlayerInitListener() {
+            @Override
+            public void onInitSuccess(@NonNull final YouTubePlayer youTubePlayer) {
+                youTubePlayer.addListener(new AbstractYouTubePlayerListener() {
+                    @Override
+                    public void onReady() {
+                        super.onReady();
+                        youTubePlayer.loadVideo(list.get(position),0);
+                    }
+                });
+            }
+        },true);
         }
     }
 

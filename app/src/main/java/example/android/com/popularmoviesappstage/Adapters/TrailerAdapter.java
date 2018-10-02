@@ -1,11 +1,13 @@
 package example.android.com.popularmoviesappstage.Adapters;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer;
@@ -21,11 +23,13 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
 
     Context context;
     List<String> stringList;
+    TrailerClickListener clickListener;
 
 
-    public TrailerAdapter(Context context, List<String> stringList) {
+    public TrailerAdapter(Context context, List<String> stringList,TrailerClickListener clickListener) {
         this.context = context;
         this.stringList = stringList;
+        this.clickListener = clickListener;
     }
 
     @NonNull
@@ -58,16 +62,26 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         return stringList.size();
     }
 
-    public class TrailerViewHolder extends RecyclerView.ViewHolder {
+
+    public class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView trailer_text;
 
         public TrailerViewHolder(View itemView) {
             super(itemView);
             trailer_text = itemView.findViewById(R.id.trailer_text);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            clickListener.trailerOnClick(position);
         }
     }
 
-
+    public interface TrailerClickListener{
+        void trailerOnClick(int position);
+    }
 
 }
