@@ -52,6 +52,7 @@ public class NetworkUtils extends AppCompatActivity {
                 .appendPath(Constant.MOVIE)
                 .appendPath(id)
                 .appendPath(Constant.REVIEWS)
+                .appendQueryParameter(Constant.API_KEY1,Constant.apiKey)
                 .build();
         URL url = null;
         try {
