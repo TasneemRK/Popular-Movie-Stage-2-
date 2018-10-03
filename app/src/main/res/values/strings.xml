@@ -8,4 +8,5 @@
     <string name="fav">Favourite</string>
     <string name="highestSort">sort by highest rate</string>
     <string name="popularSort">sort by popular</string>
+    <string name="reviews">Reviews:</string>
 </resources>

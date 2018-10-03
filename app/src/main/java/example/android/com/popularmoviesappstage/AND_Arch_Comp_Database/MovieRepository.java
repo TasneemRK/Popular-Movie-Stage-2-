@@ -12,7 +12,7 @@ import example.android.com.popularmoviesappstage.Models.Movie;
 public class MovieRepository {
 
     private MovieDao movieDao;
-    private LiveData<List<Movie>> allFavMovies;
+    private List<Movie> allFavMovies;
 
     public MovieRepository(Application application) {
         MovieRoom movieRoom = MovieRoom.getInstance(application);
@@ -20,7 +20,7 @@ public class MovieRepository {
         allFavMovies = movieDao.getAllFav();
     }
 
-    LiveData<List<Movie>> getAllFavMovies() {
+    List<Movie> getAllFavMovies() {
         return allFavMovies;
     }
 

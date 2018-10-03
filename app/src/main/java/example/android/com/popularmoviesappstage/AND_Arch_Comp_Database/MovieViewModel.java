@@ -15,7 +15,7 @@ import example.android.com.popularmoviesappstage.Models.Movie;
 public class MovieViewModel extends AndroidViewModel {
 
     private MovieRepository movieRepository;
-    private LiveData<List<Movie>> allFavMovies;
+    private List<Movie> allFavMovies;
 
     public MovieViewModel(@NonNull Application application) {
         super(application);
@@ -23,7 +23,7 @@ public class MovieViewModel extends AndroidViewModel {
         allFavMovies = movieRepository.getAllFavMovies();
     }
 
-    public LiveData<List<Movie>> getAllFavMovies(){
+    public List<Movie> getAllFavMovies(){
         return allFavMovies;
     }
 

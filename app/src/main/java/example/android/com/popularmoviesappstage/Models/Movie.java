@@ -2,39 +2,37 @@ package example.android.com.popularmoviesappstage.Models;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-@Entity
+@Entity(tableName = "favourite_table")
 public class Movie implements Parcelable {
 
     @PrimaryKey
-    @ColumnInfo(name = "movie_id")
+    @NonNull
     private int id;
-    @ColumnInfo(name = "movie_Original_title")
     private String Original_title;
-    @ColumnInfo(name = "movie_Overview")
     private String Overview;
-    @ColumnInfo(name = "movie_image")
     private String image;
-    @ColumnInfo(name = "movie_rating")
     private String rating;
-    @ColumnInfo(name = "movie_release_date")
     private String release_date;
 
+    @Ignore
     public Movie() {
     }
 
-    public Movie(int id, String original_title, String overview, String image, String rating, String release_date) {
+    public Movie(@NonNull int id, String Original_title, String Overview, String image, String rating, String release_date) {
         this.id = id;
-        Original_title = original_title;
-        Overview = overview;
+        this.Original_title = Original_title;
+        this.Overview = Overview;
         this.image = image;
         this.rating = rating;
         this.release_date = release_date;
     }
 
+    @Ignore
     public Movie(String original_title, String overview, String image, String rating, String release_date) {
         this.Original_title = original_title;
         this.Overview = overview;
@@ -55,16 +53,16 @@ public class Movie implements Parcelable {
         return Original_title;
     }
 
-    public void setOriginal_title(String original_title) {
-        Original_title = original_title;
+    public void setOriginal_title(String Original_title) {
+        this.Original_title = Original_title;
     }
 
     public String getOverview() {
         return Overview;
     }
 
-    public void setOverview(String overview) {
-        Overview = overview;
+    public void setOverview(String Overview) {
+        this.Overview = Overview;
     }
 
     public String getImage() {

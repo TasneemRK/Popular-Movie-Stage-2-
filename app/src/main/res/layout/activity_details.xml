@@ -10,9 +10,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/movie_image"
@@ -20,26 +17,35 @@
                 android:layout_height="170dp"
                 android:scaleType="fitXY" />
 
-            <ImageButton
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_margin="5dp"
-                android:src="@drawable/ic_star_black_24dp"
-                android:background="@null"
-                android:scaleType="fitXY"/>
 
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/original_text"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="3dp"
-            android:padding="8dp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/original_text"
+                android:layout_width="0dp"
+                android:layout_weight="9"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="3dp"
+                android:padding="8dp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/addToFav_button"
+                android:layout_width="30dp"
+                android:layout_weight="1"
+                android:layout_height="30dp"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="5dp"
+                android:background="@null"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_star_black_24dp" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/overview"
@@ -73,6 +79,20 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/trailerReycle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="3dp"
+            android:padding="8dp"
+            android:text="@string/reviews" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/reviewsReycle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
