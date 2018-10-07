@@ -26,7 +26,7 @@ import example.android.com.popularmoviesappstage.R;
 import example.android.com.popularmoviesappstage.Utils.Constant;
 import example.android.com.popularmoviesappstage.Utils.NetworkUtils;
 
-public class MainActivity extends NetworkUtils implements MoviesAdapter.RecycleItemClick {
+public class MainActivity extends NetworkUtils{
 
     public static final String RESULT_JSON = "results";
     public static final String ID_JSON = "id";
@@ -35,7 +35,6 @@ public class MainActivity extends NetworkUtils implements MoviesAdapter.RecycleI
     public static final String OVERVIEW_JSON = "overview";
     public static final String DATE_JSON = "release_date";
     public static final String RATING_JSON = "vote_average";
-    public static final String MOVIE_OBJECT = "movie_object";
     public static final int GRID_SPANCOUNT = 2;
 
     List<Movie> movies = new ArrayList<>();
@@ -51,7 +50,7 @@ public class MainActivity extends NetworkUtils implements MoviesAdapter.RecycleI
 
         ButterKnife.bind(this);
 
-        adapter = new MoviesAdapter(this, movies, this);
+        adapter = new MoviesAdapter(this, movies);
         moviesRecycle.setAdapter(adapter);
         GridLayoutManager layoutManager = new GridLayoutManager(this, GRID_SPANCOUNT);
         moviesRecycle.setLayoutManager(layoutManager);
@@ -100,14 +99,8 @@ public class MainActivity extends NetworkUtils implements MoviesAdapter.RecycleI
         return true;
     }
 
-    @Override
-    public void onItemClickListener(int clickIndex) {
-        Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-        startActivity(intent);
-    }
 
-
-    public class GetMoviesAsyncTask extends AsyncTask<String, Void, List<Movie>> implements MoviesAdapter.RecycleItemClick {
+    public class GetMoviesAsyncTask extends AsyncTask<String, Void, List<Movie>>{
 
         List<Movie> movies = new ArrayList<>();
 
@@ -161,15 +154,9 @@ public class MainActivity extends NetworkUtils implements MoviesAdapter.RecycleI
 
         @Override
         protected void onPostExecute(List<Movie> movies1) {
-            adapter = new MoviesAdapter(MainActivity.this, movies1, this);
+            adapter = new MoviesAdapter(MainActivity.this, movies1);
             moviesRecycle.setAdapter(adapter);
         }
 
-        @Override
-        public void onItemClickListener(int clickIndex) {
-            Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-            intent.putExtra(MOVIE_OBJECT, movies.get(clickIndex));
-            startActivity(intent);
-        }
     }
 }

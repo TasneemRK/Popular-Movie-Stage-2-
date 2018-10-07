@@ -1,6 +1,7 @@
 package example.android.com.popularmoviesappstage.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatRatingBar;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import example.android.com.popularmoviesappstage.Activites.DetailsActivity;
 import example.android.com.popularmoviesappstage.Models.Movie;
 import example.android.com.popularmoviesappstage.R;
 
@@ -21,12 +23,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.movieViewH
 
     Context context;
     List<Movie> movies;
-    final private RecycleItemClick recycleItemClick;
+    public static final String MOVIE_OBJECT = "movie_object";
 
-    public MoviesAdapter(Context context, List<Movie> movies,RecycleItemClick recycleItemClick) {
+    public MoviesAdapter(Context context, List<Movie> movies) {
         this.context = context;
         this.movies = movies;
-        this.recycleItemClick = recycleItemClick;
     }
 
     @NonNull
@@ -68,7 +69,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.movieViewH
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
-            recycleItemClick.onItemClickListener(position);
+            Intent intent = new Intent(context,DetailsActivity.class);
+            intent.putExtra(MOVIE_OBJECT,movies.get(position));
+            context.startActivity(intent);
         }
     }
 

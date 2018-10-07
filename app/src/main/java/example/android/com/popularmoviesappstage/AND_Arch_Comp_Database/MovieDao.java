@@ -14,7 +14,7 @@ import example.android.com.popularmoviesappstage.Models.Movie;
 @Dao
 public interface MovieDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert
     void addToFav(Movie movie);
 
     @Delete
@@ -24,5 +24,5 @@ public interface MovieDao {
     void deleteAllFav();
 
     @Query("select * from favourite_table")
-    List<Movie> getAllFav();
+    LiveData<List<Movie>> getAllFav();
 }

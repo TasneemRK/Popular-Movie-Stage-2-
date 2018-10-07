@@ -15,6 +15,10 @@ android {
 //            buildConfigField 'String', "ApiKey", PopularMovieApp_ApiKey
 //            resValue 'string', "api_key", PopularMovieApp_ApiKey
         }
+        customDebugType {
+            debuggable true
+
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

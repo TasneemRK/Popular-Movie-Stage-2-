@@ -1,10 +1,13 @@
 package example.android.com.popularmoviesappstage.Activites;
 
 import android.app.Dialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,6 +36,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.AppExecutors;
+import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MainViewModel;
+import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MovieDetailsViewModelFactory;
+import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MovieRoom;
+import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MovieViewModel;
+import example.android.com.popularmoviesappstage.Adapters.MoviesAdapter;
 import example.android.com.popularmoviesappstage.Adapters.ReviewAdapter;
 import example.android.com.popularmoviesappstage.Adapters.TrailerAdapter;
 import example.android.com.popularmoviesappstage.Models.Movie;
@@ -76,7 +85,10 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
-//        MovieViewModel movieViewModel = ViewModelProviders.of(DetailsActivity.this).get(MovieViewModel.class);
+        final MovieRoom movieRoom = MovieRoom.getInstance(this);
+
+        final MainViewModel mainViewModel = ViewModelProviders.of(DetailsActivity.this).get(MainViewModel.class);
+
 
         ButterKnife.bind(this);
 
@@ -84,36 +96,62 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
         reviewList = new ArrayList<>();
 
         trailer_recycle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        adapter = new TrailerAdapter(this, list,this);
+        adapter = new TrailerAdapter(this, list, this);
         trailer_recycle.setAdapter(adapter);
 
-        reviewsReycle.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-        reviewAdapter = new ReviewAdapter(this,reviewList);
+        reviewsReycle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        reviewAdapter = new ReviewAdapter(this, reviewList);
         reviewsReycle.setAdapter(reviewAdapter);
 
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra(MainActivity.MOVIE_OBJECT)) {
-            final Movie movie = intent.getParcelableExtra(MainActivity.MOVIE_OBJECT);
+        if (intent != null && intent.hasExtra(MoviesAdapter.MOVIE_OBJECT)) {
+            final Movie movie = intent.getParcelableExtra(MoviesAdapter.MOVIE_OBJECT);
+            MovieDetailsViewModelFactory factory = new MovieDetailsViewModelFactory(movieRoom, movie);
+            final MovieViewModel movieViewModel = ViewModelProviders.of(this, factory).get(MovieViewModel.class);
+
+
             Picasso.get().load(movie.getImage()).into(movie_image);
             original_text.setText(movie.getOriginal_title());
             overview.setText(movie.getOverview());
             date.append(movie.getRelease_date());
             rating.append(movie.getRating());
             int id = movie.getId();
-            if(isOnline()){
+            if (isOnline()) {
                 new TrailerAsyncTask().execute(id + "");
-                new ReviewAsyncTask().execute(id+"");
-            }else {
+                new ReviewAsyncTask().execute(id + "");
+            } else {
                 Toast.makeText(this, "check internet connection", Toast.LENGTH_SHORT).show();
             }
 
             addToFav.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Toast.makeText(DetailsActivity.this, "addToFav", Toast.LENGTH_SHORT).show();
-//                    movieViewModel.addToFav(movie);
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            mainViewModel.getAllFavMovies().observe(DetailsActivity.this, new Observer<List<Movie>>() {
+                                @Override
+                                public void onChanged(@Nullable List<Movie> movies) {
+                                    if (movies.contains(movie)){
+                                        Toast.makeText(DetailsActivity.this, "already exists!", Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    movieViewModel.addToFav();
+//                                                    Toast.makeText(DetailsActivity.this, "addToFav", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                    }
+
+                                }
+                            });
+                        }
+                    });
                 }
             });
+
         }
 
     }
@@ -123,7 +161,7 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
     }
 
 
-    public  class TrailerAsyncTask extends AsyncTask<String, Void, List<String>> implements TrailerAdapter.TrailerClickListener {
+    public class TrailerAsyncTask extends AsyncTask<String, Void, List<String>> implements TrailerAdapter.TrailerClickListener {
 
         List<String> list = new ArrayList<>();
 
@@ -137,9 +175,9 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
                 String result = NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildTrailerUrl(strings[0]));
                 JSONObject jsonObjectResult = new JSONObject(result);
                 JSONArray resultArray = jsonObjectResult.getJSONArray(RESULTS);
-                for (int i=0 ; i<resultArray.length();i++){
+                for (int i = 0; i < resultArray.length(); i++) {
                     JSONObject jsonObject = resultArray.getJSONObject(i);
-                    String key  = jsonObject.getString(KEY);
+                    String key = jsonObject.getString(KEY);
                     list.add(key);
                 }
             } catch (IOException e) {
@@ -153,7 +191,7 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
         @Override
         protected void onPostExecute(List<String> strings) {
             super.onPostExecute(strings);
-            adapter = new TrailerAdapter(DetailsActivity.this, strings,this);
+            adapter = new TrailerAdapter(DetailsActivity.this, strings, this);
             trailer_recycle.setAdapter(adapter);
         }
 
@@ -167,42 +205,42 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
 
             YouTubePlayerView youTubePlayerView = dialog.findViewById(R.id.youtube_player);
             youTubePlayerView.initialize(new YouTubePlayerInitListener() {
-            @Override
-            public void onInitSuccess(@NonNull final YouTubePlayer youTubePlayer) {
-                youTubePlayer.addListener(new AbstractYouTubePlayerListener() {
-                    @Override
-                    public void onReady() {
-                        super.onReady();
-                        youTubePlayer.loadVideo(list.get(position),0);
-                    }
-                });
-            }
-        },true);
+                @Override
+                public void onInitSuccess(@NonNull final YouTubePlayer youTubePlayer) {
+                    youTubePlayer.addListener(new AbstractYouTubePlayerListener() {
+                        @Override
+                        public void onReady() {
+                            super.onReady();
+                            youTubePlayer.loadVideo(list.get(position), 0);
+                        }
+                    });
+                }
+            }, true);
         }
     }
 
-    public  class ReviewAsyncTask extends AsyncTask<String,Void,List<Review>>{
+    public class ReviewAsyncTask extends AsyncTask<String, Void, List<Review>> {
 
         List<Review> list = new ArrayList<>();
 
         @Override
         protected List<Review> doInBackground(String... strings) {
-            if (strings[0] == null){
+            if (strings[0] == null) {
                 return null;
             }
-            try{
-            String result = NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildReviewUrl(strings[0]));
-            JSONObject jsonObjectResult = new JSONObject(result);
-            JSONArray resultArray = jsonObjectResult.getJSONArray(RESULTS);
-            for (int i=0 ; i<resultArray.length();i++) {
-                JSONObject jsonObject = resultArray.getJSONObject(i);
-                String author = jsonObject.getString(AUTHOR);
-                String content = jsonObject.getString(CONTENT);
-                Review review = new Review(author,content);
-                list.add(review);
+            try {
+                String result = NetworkUtils.getResponseFromHttpUrl(NetworkUtils.buildReviewUrl(strings[0]));
+                JSONObject jsonObjectResult = new JSONObject(result);
+                JSONArray resultArray = jsonObjectResult.getJSONArray(RESULTS);
+                for (int i = 0; i < resultArray.length(); i++) {
+                    JSONObject jsonObject = resultArray.getJSONObject(i);
+                    String author = jsonObject.getString(AUTHOR);
+                    String content = jsonObject.getString(CONTENT);
+                    Review review = new Review(author, content);
+                    list.add(review);
 
-            }
-        } catch (JSONException e) {
+                }
+            } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -213,7 +251,7 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
         @Override
         protected void onPostExecute(List<Review> reviews) {
             super.onPostExecute(reviews);
-            reviewAdapter = new ReviewAdapter(DetailsActivity.this,reviews);
+            reviewAdapter = new ReviewAdapter(DetailsActivity.this, reviews);
             reviewsReycle.setAdapter(reviewAdapter);
         }
     }

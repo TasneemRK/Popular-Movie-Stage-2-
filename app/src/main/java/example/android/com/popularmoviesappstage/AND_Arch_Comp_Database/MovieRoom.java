@@ -21,7 +21,7 @@ public abstract class MovieRoom extends RoomDatabase {
     public static MovieRoom getInstance(Context context){
         if (instance == null){
             synchronized (LOCK){
-                instance = Room.databaseBuilder(context,MovieRoom.class,DB_NAME).build();
+                instance = Room.databaseBuilder(context.getApplicationContext(),MovieRoom.class,DB_NAME).build();
             }
         }
         return instance;
