@@ -36,10 +36,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.AppExecutors;
-import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MainViewModel;
-import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MovieDetailsViewModelFactory;
-import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MovieRoom;
+import butterknife.OnClick;
 import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MovieViewModel;
 import example.android.com.popularmoviesappstage.Adapters.MoviesAdapter;
 import example.android.com.popularmoviesappstage.Adapters.ReviewAdapter;
@@ -47,7 +44,6 @@ import example.android.com.popularmoviesappstage.Adapters.TrailerAdapter;
 import example.android.com.popularmoviesappstage.Models.Movie;
 import example.android.com.popularmoviesappstage.Models.Review;
 import example.android.com.popularmoviesappstage.R;
-import example.android.com.popularmoviesappstage.Utils.AsyncTasks;
 import example.android.com.popularmoviesappstage.Utils.NetworkUtils;
 
 
@@ -80,78 +76,69 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
     @BindView(R.id.reviewsReycle)
     RecyclerView reviewsReycle;
 
+    Movie movie;
+    MovieViewModel movieViewModel;
+    private boolean isFavourite =false ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
-        final MovieRoom movieRoom = MovieRoom.getInstance(this);
-
-        final MainViewModel mainViewModel = ViewModelProviders.of(DetailsActivity.this).get(MainViewModel.class);
-
-
         ButterKnife.bind(this);
 
+        // --------------- load trailers from movie -------------
         list = new ArrayList<>();
-        reviewList = new ArrayList<>();
-
         trailer_recycle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         adapter = new TrailerAdapter(this, list, this);
         trailer_recycle.setAdapter(adapter);
 
+        // --------------- load reviews for movie -------------
+        reviewList = new ArrayList<>();
         reviewsReycle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         reviewAdapter = new ReviewAdapter(this, reviewList);
         reviewsReycle.setAdapter(reviewAdapter);
 
+        // ---------------- get Movie details from intent --------------------
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(MoviesAdapter.MOVIE_OBJECT)) {
-            final Movie movie = intent.getParcelableExtra(MoviesAdapter.MOVIE_OBJECT);
-            MovieDetailsViewModelFactory factory = new MovieDetailsViewModelFactory(movieRoom, movie);
-            final MovieViewModel movieViewModel = ViewModelProviders.of(this, factory).get(MovieViewModel.class);
+            movie = intent.getParcelableExtra(MoviesAdapter.MOVIE_OBJECT);
+            loadMovieData(movie);
+        }
+
+        movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
 
-            Picasso.get().load(movie.getImage()).into(movie_image);
-            original_text.setText(movie.getOriginal_title());
-            overview.setText(movie.getOverview());
-            date.append(movie.getRelease_date());
-            rating.append(movie.getRating());
-            int id = movie.getId();
-            if (isOnline()) {
-                new TrailerAsyncTask().execute(id + "");
-                new ReviewAsyncTask().execute(id + "");
-            } else {
-                Toast.makeText(this, "check internet connection", Toast.LENGTH_SHORT).show();
-            }
 
-            addToFav.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
+    }
 
-                            mainViewModel.getAllFavMovies().observe(DetailsActivity.this, new Observer<List<Movie>>() {
-                                @Override
-                                public void onChanged(@Nullable List<Movie> movies) {
-                                    if (movies.contains(movie)){
-                                        Toast.makeText(DetailsActivity.this, "already exists!", Toast.LENGTH_SHORT).show();
-                                    }else {
-                                        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    movieViewModel.addToFav();
-//                                                    Toast.makeText(DetailsActivity.this, "addToFav", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                    }
+    private void loadMovieData(Movie movie) {
+        Picasso.get().load(movie.getImage()).into(movie_image);
+        original_text.setText(movie.getOriginal_title());
+        overview.setText(movie.getOverview());
+        date.append(movie.getRelease_date());
+        rating.append(movie.getRating());
+        int id = movie.getId();
+        if (isOnline()) {
+            new TrailerAsyncTask().execute(id + "");
+            new ReviewAsyncTask().execute(id + "");
+        } else {
+            Toast.makeText(this, "check internet connection", Toast.LENGTH_SHORT).show();
+        }
+    }
 
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-
+    @OnClick(R.id.addToFav_button)
+    void setAddToFav(){
+        if (isFavourite){
+            movieViewModel.deletetMovie(movie);
+            addToFav.setImageResource(R.drawable.ic_star_black_24dp);
+            Toast.makeText(this, "remove from fav", Toast.LENGTH_SHORT).show();
+            isFavourite = false;
+        }else {
+            movieViewModel.insertMovie(movie);
+            addToFav.setImageResource(R.drawable.ic_star_fill_24dp);
+            Toast.makeText(this, "add to fav", Toast.LENGTH_SHORT).show();
+            isFavourite = true;
         }
 
     }

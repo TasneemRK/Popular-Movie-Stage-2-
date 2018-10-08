@@ -1,28 +1,45 @@
 package example.android.com.popularmoviesappstage.AND_Arch_Comp_Database;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
+import android.support.annotation.NonNull;
+
+import java.util.List;
+
 import example.android.com.popularmoviesappstage.Models.Movie;
 
-public class MovieViewModel extends ViewModel {
+public class MovieViewModel extends AndroidViewModel {
 
-    private Movie movie;
-    private MovieRoom movieRoom;
+    private MovieRepository repository;
+    private LiveData<List<Movie>> allFav;
 
-
-    public MovieViewModel(MovieRoom movieRoom , Movie movie){
-        this.movieRoom = movieRoom;
-        this.movie = movie;
+    public MovieViewModel(@NonNull Application application) {
+        super(application);
+        repository = new MovieRepository(application);
+        allFav = repository.getAllFavMovies();
     }
 
-    public void addToFav(){
-        movieRoom.movieDao().addToFav(movie);
-    }
-    public void RemoveFromFav(){
-        movieRoom.movieDao().deleteFromFav(movie);
+    public LiveData<List<Movie>> getAllFav(){
+        return allFav;
     }
 
-    public void deleteAllFav(){
-        movieRoom.movieDao().deleteAllFav();
+    public void insertMovie(Movie movie){
+        repository.addToFav(movie);
     }
 
+
+    public void deletetMovie(Movie movie){
+        repository.deleteFromFav(movie);
+    }
+
+
+    public void loadMovieById(int movie_id){
+        repository.loadMovieById(movie_id);
+    }
+
+    public void deleteAll(){
+        repository.deleteAll();
+    }
 }

@@ -79,4 +79,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.movieViewH
         void onItemClickListener(int clickIndex);
     }
 
+
+    public void reset() {
+        movies.clear();
+        notifyDataSetChanged();
+    }
+
 }

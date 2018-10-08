@@ -1,8 +1,12 @@
 package example.android.com.popularmoviesappstage.Activites;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -20,6 +24,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MovieViewModel;
 import example.android.com.popularmoviesappstage.Adapters.MoviesAdapter;
 import example.android.com.popularmoviesappstage.Models.Movie;
 import example.android.com.popularmoviesappstage.R;
@@ -92,8 +97,15 @@ public class MainActivity extends NetworkUtils{
                 }
                 break;
             case R.id.favourite:
-                Intent intent = new Intent(MainActivity.this,FavouriteActivity.class);
-                startActivity(intent);
+                MovieViewModel model = ViewModelProviders.of(this).get(MovieViewModel.class);
+                model.getAllFav().observe(this, new Observer<List<Movie>>() {
+                    @Override
+                    public void onChanged(@Nullable List<Movie> movies) {
+                        adapter.reset();
+                        adapter = new MoviesAdapter(MainActivity.this,movies);
+                        moviesRecycle.setAdapter(adapter);
+                    }
+                });
                 break;
         }
         return true;
@@ -137,6 +149,7 @@ public class MainActivity extends NetworkUtils{
                     if (resultJson.has(RATING_JSON)) {
                         movie.setRating(resultJson.getDouble(RATING_JSON) + "");
                     }
+
 
                     movies.add(movie);
 

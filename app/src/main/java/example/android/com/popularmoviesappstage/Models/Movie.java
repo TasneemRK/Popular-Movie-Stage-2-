@@ -7,6 +7,8 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+
+
 @Entity(tableName = "favourite_table")
 public class Movie implements Parcelable {
 
@@ -19,17 +21,19 @@ public class Movie implements Parcelable {
     private String rating;
     private String release_date;
 
+
     @Ignore
     public Movie() {
     }
 
-    public Movie(@NonNull int id, String Original_title, String Overview, String image, String rating, String release_date) {
+    public Movie(@NonNull int id, String Original_title, String Overview, String image, String rating, String release_date ) {
         this.id = id;
         this.Original_title = Original_title;
         this.Overview = Overview;
         this.image = image;
         this.rating = rating;
         this.release_date = release_date;
+
     }
 
     @Ignore
