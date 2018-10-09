@@ -2,7 +2,6 @@ package example.android.com.popularmoviesappstage.AND_Arch_Comp_Database;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
-import android.database.Cursor;
 import android.os.AsyncTask;
 
 import java.util.List;
@@ -37,12 +36,16 @@ public class MovieRepository {
         new DeleteAllAsyncTask(movieDao).execute();
     }
 
-    public Movie loadMovieById(int movie_id){
+    public Movie loadMovieById(int movie_id) {
         new loadMovieByIdAsyncTask(movieDao).execute(movie_id);
         return movieloaded;
     }
 
-    /// ------------------------------------ AsyncTasks --------------------------------------------
+    public void updateFav(Movie movie) {
+        new updateFavAsyncTask(movieDao).equals(movie);
+    }
+
+    /// ------------------------------------  All AsyncTasks Classes --------------------------------------------
 
     private static class AddToFavAsyncTask extends AsyncTask<Movie, Void, Void> {
 
@@ -90,7 +93,7 @@ public class MovieRepository {
         }
     }
 
-    public static class loadMovieByIdAsyncTask extends AsyncTask<Integer,Void,Movie>{
+    public static class loadMovieByIdAsyncTask extends AsyncTask<Integer, Void, Movie> {
 
         private MovieDao movieDao;
 
@@ -107,6 +110,21 @@ public class MovieRepository {
         protected void onPostExecute(Movie movie) {
             super.onPostExecute(movie);
             movieloaded = movie;
+        }
+    }
+
+    public class updateFavAsyncTask extends AsyncTask<Movie, Void, Void> {
+
+        private MovieDao movieDao;
+
+        public updateFavAsyncTask(MovieDao movieDao) {
+            this.movieDao = movieDao;
+        }
+
+        @Override
+        protected Void doInBackground(Movie... movies) {
+            movieDao.updateFav(movies[0]);
+            return null;
         }
     }
 }

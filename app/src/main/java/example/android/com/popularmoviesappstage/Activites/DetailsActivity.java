@@ -1,29 +1,19 @@
 package example.android.com.popularmoviesappstage.Activites;
 
-import android.app.Dialog;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
-import android.view.Window;
+import android.view.MenuItem;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer;
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView;
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.AbstractYouTubePlayerListener;
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.YouTubePlayerInitListener;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -78,7 +68,6 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
 
     Movie movie;
     MovieViewModel movieViewModel;
-    private boolean isFavourite =false ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,29 +76,37 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
 
         ButterKnife.bind(this);
 
-        // --------------- load trailers from movie -------------
-        list = new ArrayList<>();
-        trailer_recycle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        adapter = new TrailerAdapter(this, list, this);
-        trailer_recycle.setAdapter(adapter);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-        // --------------- load reviews for movie -------------
-        reviewList = new ArrayList<>();
-        reviewsReycle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        reviewAdapter = new ReviewAdapter(this, reviewList);
-        reviewsReycle.setAdapter(reviewAdapter);
+        movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+
+        LoadTrailers();
+
+        LoadReviews();
 
         // ---------------- get Movie details from intent --------------------
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(MoviesAdapter.MOVIE_OBJECT)) {
             movie = intent.getParcelableExtra(MoviesAdapter.MOVIE_OBJECT);
             loadMovieData(movie);
+            actionBar.setTitle(movie.getOriginal_title());
         }
 
-        movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+    }
 
+    private void LoadReviews() {
+        reviewList = new ArrayList<>();
+        reviewsReycle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        reviewAdapter = new ReviewAdapter(this, reviewList);
+        reviewsReycle.setAdapter(reviewAdapter);
+    }
 
-
+    private void LoadTrailers() {
+        list = new ArrayList<>();
+        trailer_recycle.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        adapter = new TrailerAdapter(this, list, this);
+        trailer_recycle.setAdapter(adapter);
     }
 
     private void loadMovieData(Movie movie) {
@@ -119,6 +116,11 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
         date.append(movie.getRelease_date());
         rating.append(movie.getRating());
         int id = movie.getId();
+        if (movie.isFav()){
+            addToFav.setImageResource(R.drawable.ic_star_fill_24dp);
+        }else {
+            addToFav.setImageResource(R.drawable.ic_star_black_24dp);
+        }
         if (isOnline()) {
             new TrailerAsyncTask().execute(id + "");
             new ReviewAsyncTask().execute(id + "");
@@ -128,19 +130,33 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
     }
 
     @OnClick(R.id.addToFav_button)
-    void setAddToFav(){
-        if (isFavourite){
+    void setAddToFav() {
+        if (movie.isFav()) {
+            movie.setFav(false);
             movieViewModel.deletetMovie(movie);
             addToFav.setImageResource(R.drawable.ic_star_black_24dp);
+            movieViewModel.updateMovie(movie);
             Toast.makeText(this, "remove from fav", Toast.LENGTH_SHORT).show();
-            isFavourite = false;
-        }else {
+
+        } else {
             movieViewModel.insertMovie(movie);
             addToFav.setImageResource(R.drawable.ic_star_fill_24dp);
+            movie.setFav(true);
+            movieViewModel.updateMovie(movie);
             Toast.makeText(this, "add to fav", Toast.LENGTH_SHORT).show();
-            isFavourite = true;
         }
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home){
+            Intent intent = new Intent(DetailsActivity.this,MainActivity.class);
+            startActivity(intent);
+            finish();
+
+        }
+        return true;
     }
 
     @Override
@@ -184,25 +200,8 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
 
         @Override
         public void trailerOnClick(final int position) {
-            Dialog dialog = new Dialog(DetailsActivity.this);
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.setContentView(R.layout.youtube_player);
-            dialog.setCancelable(true);
-            dialog.show();
-
-            YouTubePlayerView youTubePlayerView = dialog.findViewById(R.id.youtube_player);
-            youTubePlayerView.initialize(new YouTubePlayerInitListener() {
-                @Override
-                public void onInitSuccess(@NonNull final YouTubePlayer youTubePlayer) {
-                    youTubePlayer.addListener(new AbstractYouTubePlayerListener() {
-                        @Override
-                        public void onReady() {
-                            super.onReady();
-                            youTubePlayer.loadVideo(list.get(position), 0);
-                        }
-                    });
-                }
-            }, true);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtu.be/" + list.get(position)));
+            startActivity(intent);
         }
     }
 

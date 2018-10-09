@@ -3,14 +3,11 @@ package example.android.com.popularmoviesappstage.AND_Arch_Comp_Database;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.TypeConverter;
-import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
 import example.android.com.popularmoviesappstage.Models.Movie;
 
 @Database(entities = {Movie.class},version = 1,exportSchema = false)
-//@TypeConverters(MovieTypeConverter.class)
 public abstract class MovieRoom extends RoomDatabase {
 
     public abstract MovieDao movieDao();

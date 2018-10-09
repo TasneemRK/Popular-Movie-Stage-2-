@@ -5,7 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +13,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-import static android.content.ContentValues.TAG;
 
 public class NetworkUtils extends AppCompatActivity {
 

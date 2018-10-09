@@ -1,6 +1,5 @@
 package example.android.com.popularmoviesappstage.Models;
 
-import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
@@ -20,29 +19,31 @@ public class Movie implements Parcelable {
     private String image;
     private String rating;
     private String release_date;
-
+    private boolean isFav;
 
     @Ignore
     public Movie() {
     }
 
-    public Movie(@NonNull int id, String Original_title, String Overview, String image, String rating, String release_date ) {
+    public Movie(@NonNull int id, String Original_title, String Overview, String image, String rating, String release_date ,boolean isFav) {
         this.id = id;
         this.Original_title = Original_title;
         this.Overview = Overview;
         this.image = image;
         this.rating = rating;
         this.release_date = release_date;
+        this.isFav = isFav;
 
     }
 
     @Ignore
-    public Movie(String original_title, String overview, String image, String rating, String release_date) {
+    public Movie(String original_title, String overview, String image, String rating, String release_date,boolean isFav) {
         this.Original_title = original_title;
         this.Overview = overview;
         this.image = image;
         this.rating = rating;
         this.release_date = release_date;
+        this.isFav = isFav;
     }
 
     public int getId() {
@@ -93,6 +94,13 @@ public class Movie implements Parcelable {
         this.release_date = release_date;
     }
 
+    public boolean isFav() {
+        return isFav;
+    }
+
+    public void setFav(boolean fav) {
+        isFav = fav;
+    }
 
     @Override
     public int describeContents() {
@@ -107,6 +115,7 @@ public class Movie implements Parcelable {
         dest.writeString(this.image);
         dest.writeString(this.rating);
         dest.writeString(this.release_date);
+        dest.writeByte(this.isFav ? (byte) 1 : (byte) 0);
     }
 
     protected Movie(Parcel in) {
@@ -116,6 +125,7 @@ public class Movie implements Parcelable {
         this.image = in.readString();
         this.rating = in.readString();
         this.release_date = in.readString();
+        this.isFav = in.readByte() != 0;
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {

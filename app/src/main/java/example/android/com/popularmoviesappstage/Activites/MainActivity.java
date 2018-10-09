@@ -1,12 +1,12 @@
 package example.android.com.popularmoviesappstage.Activites;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -42,8 +42,15 @@ public class MainActivity extends NetworkUtils{
     public static final String RATING_JSON = "vote_average";
     public static final int GRID_SPANCOUNT = 2;
 
+    public static String CHOOSENLAYOUT_KEY = "choosen_layout";
+    public static int CHOOSENLAYOUT = 0;
+    public static final int POPOLAR_INT = 1;
+    public static final int HIGHEST_INT = 2;
+    public static final int FAVO_INT = 3;
+
     List<Movie> movies = new ArrayList<>();
     MoviesAdapter adapter;
+    ActionBar actionBar;
 
     @BindView(R.id.moviesRecycleView)
     RecyclerView moviesRecycle;
@@ -53,19 +60,27 @@ public class MainActivity extends NetworkUtils{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        actionBar = getSupportActionBar();
+
         ButterKnife.bind(this);
 
-        adapter = new MoviesAdapter(this, movies);
-        moviesRecycle.setAdapter(adapter);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, GRID_SPANCOUNT);
-        moviesRecycle.setLayoutManager(layoutManager);
+        SetupRecycle();
 
-        if (isOnline()) {
-            new GetMoviesAsyncTask().execute(Constant.ALL_MOIVES_API);
-        } else {
-            Toast.makeText(this, "you are not connected to the internet.", Toast.LENGTH_SHORT).show();
+        getAllMovies();
+
+        if (savedInstanceState != null){
+            switch (savedInstanceState.getInt(CHOOSENLAYOUT_KEY)){
+                case POPOLAR_INT:
+                    getPopularMovies();
+                    break;
+                case HIGHEST_INT:
+                    getHighestRateMovies();
+                    break;
+                case FAVO_INT:
+                    getFavouriteMovies();
+                    break;
+            }
         }
-
 
     }
 
@@ -80,35 +95,74 @@ public class MainActivity extends NetworkUtils{
         int id = item.getItemId();
         switch (id) {
             case R.id.popular_sort:
-                if (isOnline()) {
-                    new GetMoviesAsyncTask().execute(Constant.SORT_BY_POPULARITY_API);
-                    adapter.notifyDataSetChanged();
-                } else {
-                    Toast.makeText(this, "you are not connected to the internet.", Toast.LENGTH_SHORT).show();
-                }
-
+                CHOOSENLAYOUT = 1;
+                getPopularMovies();
                 break;
             case R.id.highestRate_sort:
-                if (isOnline()) {
-                    new GetMoviesAsyncTask().execute(Constant.SORT_BY_TOP_RATES_API);
-                    adapter.notifyDataSetChanged();
-                } else {
-                    Toast.makeText(this, "you are not connected to the internet.", Toast.LENGTH_SHORT).show();
-                }
+                CHOOSENLAYOUT = 2;
+                getHighestRateMovies();
                 break;
             case R.id.favourite:
-                MovieViewModel model = ViewModelProviders.of(this).get(MovieViewModel.class);
-                model.getAllFav().observe(this, new Observer<List<Movie>>() {
-                    @Override
-                    public void onChanged(@Nullable List<Movie> movies) {
-                        adapter.reset();
-                        adapter = new MoviesAdapter(MainActivity.this,movies);
-                        moviesRecycle.setAdapter(adapter);
-                    }
-                });
+                CHOOSENLAYOUT = 3;
+                getFavouriteMovies();
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putInt(CHOOSENLAYOUT_KEY,CHOOSENLAYOUT);
+    }
+
+    private void SetupRecycle() {
+        adapter = new MoviesAdapter(this, movies);
+        moviesRecycle.setAdapter(adapter);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, GRID_SPANCOUNT);
+        moviesRecycle.setLayoutManager(layoutManager);
+    }
+
+    private void getAllMovies() {
+        if (isOnline()) {
+            new GetMoviesAsyncTask().execute(Constant.ALL_MOIVES_API);
+        } else {
+            Toast.makeText(this, "you are not connected to the internet.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void getFavouriteMovies() {
+        MovieViewModel model = ViewModelProviders.of(this).get(MovieViewModel.class);
+        model.getAllFav().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                adapter = new MoviesAdapter(MainActivity.this,movies);
+                moviesRecycle.setAdapter(adapter);
+                actionBar.setTitle(R.string.fav);
+            }
+        });
+    }
+
+    private void getHighestRateMovies() {
+        adapter.reset();
+        if (isOnline()) {
+            new GetMoviesAsyncTask().execute(Constant.SORT_BY_TOP_RATES_API);
+            adapter.notifyDataSetChanged();
+            actionBar.setTitle(R.string.highestSort);
+        } else {
+            Toast.makeText(this, "you are not connected to the internet.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void getPopularMovies() {
+        adapter.reset();
+        if (isOnline()) {
+            new GetMoviesAsyncTask().execute(Constant.SORT_BY_POPULARITY_API);
+            adapter.notifyDataSetChanged();
+            actionBar.setTitle(R.string.popularSort);
+        } else {
+            Toast.makeText(this, "you are not connected to the internet.", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -149,7 +203,6 @@ public class MainActivity extends NetworkUtils{
                     if (resultJson.has(RATING_JSON)) {
                         movie.setRating(resultJson.getDouble(RATING_JSON) + "");
                     }
-
 
                     movies.add(movie);
 

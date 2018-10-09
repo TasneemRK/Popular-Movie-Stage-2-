@@ -20,7 +20,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activites.DetailsActivity" />
-        <activity android:name=".Activites.FavouriteActivity"></activity>
     </application>
 
 </manifest>
