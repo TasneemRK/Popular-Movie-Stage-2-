@@ -24,8 +24,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.movieViewH
     List<Movie> movies;
     public static final String MOVIE_OBJECT = "movie_object";
 
-    public MoviesAdapter(Context context, List<Movie> movies) {
+    public MoviesAdapter(Context context) {
         this.context = context;
+        notifyDataSetChanged();
+    }
+
+    public void setMoviesList(List<Movie>movies){
         this.movies = movies;
     }
 
