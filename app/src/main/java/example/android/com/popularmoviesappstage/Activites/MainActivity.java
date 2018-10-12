@@ -4,11 +4,13 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -25,13 +27,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MovieViewModel;
+import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.RecentMoviesViewModel;
 import example.android.com.popularmoviesappstage.Adapters.MoviesAdapter;
 import example.android.com.popularmoviesappstage.Models.Movie;
 import example.android.com.popularmoviesappstage.R;
 import example.android.com.popularmoviesappstage.Utils.Constant;
 import example.android.com.popularmoviesappstage.Utils.NetworkUtils;
 
-public class MainActivity extends NetworkUtils{
+public class MainActivity extends NetworkUtils {
 
     public static final String RESULT_JSON = "results";
     public static final String ID_JSON = "id";
@@ -42,11 +45,13 @@ public class MainActivity extends NetworkUtils{
     public static final String RATING_JSON = "vote_average";
     public static final int GRID_SPANCOUNT = 2;
 
-    public static String CHOOSENLAYOUT_KEY = "choosen_layout";
-    public static int CHOOSENLAYOUT = 0;
-    public static final int POPOLAR_INT = 1;
-    public static final int HIGHEST_INT = 2;
-    public static final int FAVO_INT = 3;
+    public static String STATE;
+    public static final String POPOLAR = "popular";
+    public static final String HIGHEST = "highest";
+    public static final String FAVO = "favourite";
+
+    private static final String SCROLL_POSITION_KEY = "scroll_position";
+    private static int mCurrentPostion = 0;
 
     List<Movie> movies = new ArrayList<>();
     MoviesAdapter adapter;
@@ -64,23 +69,22 @@ public class MainActivity extends NetworkUtils{
 
         ButterKnife.bind(this);
 
-        SetupRecycle();
 
-        getAllMovies();
 
-        if (savedInstanceState != null){
-            switch (savedInstanceState.getInt(CHOOSENLAYOUT_KEY)){
-                case POPOLAR_INT:
-                    getPopularMovies();
-                    break;
-                case HIGHEST_INT:
-                    getHighestRateMovies();
-                    break;
-                case FAVO_INT:
-                    getFavouriteMovies();
-                    break;
+        if (savedInstanceState != null) {
+//            Log.d("savedInstanceState",savedInstanceState.getString("state"));
+            if (savedInstanceState.getString("state").equals(POPOLAR)) {
+                getPopularMovies();
+            } else if (savedInstanceState.getString("state").equals(HIGHEST)) {
+                getHighestRateMovies();
+            } else if (savedInstanceState.getString("state").equals(FAVO)) {
+                getFavouriteMovies();
             }
+        } else {
+            SetupRecycle();
+            Log.d("savedInstanceStateNull","null");
         }
+
 
     }
 
@@ -95,15 +99,12 @@ public class MainActivity extends NetworkUtils{
         int id = item.getItemId();
         switch (id) {
             case R.id.popular_sort:
-                CHOOSENLAYOUT = 1;
                 getPopularMovies();
                 break;
             case R.id.highestRate_sort:
-                CHOOSENLAYOUT = 2;
                 getHighestRateMovies();
                 break;
             case R.id.favourite:
-                CHOOSENLAYOUT = 3;
                 getFavouriteMovies();
                 break;
         }
@@ -113,7 +114,18 @@ public class MainActivity extends NetworkUtils{
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        outState.putInt(CHOOSENLAYOUT_KEY,CHOOSENLAYOUT);
+        outState.putString("state",STATE);
+        int pos = ((GridLayoutManager) (moviesRecycle.getLayoutManager())).findFirstCompletelyVisibleItemPosition();
+        outState.putInt(SCROLL_POSITION_KEY, pos);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        // Retrieve list state and list/item positions
+        if (state != null) {
+            mCurrentPostion = state.getInt(SCROLL_POSITION_KEY, 0);
+        }
     }
 
     private void SetupRecycle() {
@@ -121,6 +133,7 @@ public class MainActivity extends NetworkUtils{
         moviesRecycle.setAdapter(adapter);
         GridLayoutManager layoutManager = new GridLayoutManager(this, GRID_SPANCOUNT);
         moviesRecycle.setLayoutManager(layoutManager);
+        getAllMovies();
     }
 
     private void getAllMovies() {
@@ -132,11 +145,12 @@ public class MainActivity extends NetworkUtils{
     }
 
     private void getFavouriteMovies() {
+        STATE = FAVO;
         MovieViewModel model = ViewModelProviders.of(this).get(MovieViewModel.class);
         model.getAllFav().observe(this, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
-                adapter = new MoviesAdapter(MainActivity.this,movies);
+                adapter = new MoviesAdapter(MainActivity.this, movies);
                 moviesRecycle.setAdapter(adapter);
                 actionBar.setTitle(R.string.fav);
             }
@@ -144,6 +158,7 @@ public class MainActivity extends NetworkUtils{
     }
 
     private void getHighestRateMovies() {
+        STATE = HIGHEST;
         adapter.reset();
         if (isOnline()) {
             new GetMoviesAsyncTask().execute(Constant.SORT_BY_TOP_RATES_API);
@@ -155,6 +170,7 @@ public class MainActivity extends NetworkUtils{
     }
 
     private void getPopularMovies() {
+        STATE = POPOLAR;
         adapter.reset();
         if (isOnline()) {
             new GetMoviesAsyncTask().execute(Constant.SORT_BY_POPULARITY_API);
@@ -166,7 +182,7 @@ public class MainActivity extends NetworkUtils{
     }
 
 
-    public class GetMoviesAsyncTask extends AsyncTask<String, Void, List<Movie>>{
+    public class GetMoviesAsyncTask extends AsyncTask<String, Void, List<Movie>> {
 
         List<Movie> movies = new ArrayList<>();
 
@@ -222,6 +238,7 @@ public class MainActivity extends NetworkUtils{
         protected void onPostExecute(List<Movie> movies1) {
             adapter = new MoviesAdapter(MainActivity.this, movies1);
             moviesRecycle.setAdapter(adapter);
+            moviesRecycle.scrollToPosition(mCurrentPostion);
         }
 
     }
