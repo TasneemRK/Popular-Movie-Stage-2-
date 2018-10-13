@@ -26,11 +26,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.movieViewH
 
     public MoviesAdapter(Context context) {
         this.context = context;
-        notifyDataSetChanged();
     }
 
     public void setMoviesList(List<Movie>movies){
         this.movies = movies;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -48,8 +48,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.movieViewH
 
     @Override
     public int getItemCount() {
+        if (movies == null){
+            return 0;
+        }
         return movies.size();
     }
+
 
     class movieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
