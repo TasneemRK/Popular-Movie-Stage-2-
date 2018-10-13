@@ -76,17 +76,6 @@ public class MainActivity extends NetworkUtils {
             getFavouriteMovies();
         }
 
-//        if (savedInstanceState != null) {
-//            Log.d("null","curently have saveinsatnece");
-//            Log.d("null",savedInstanceState.containsKey(STATE_KEY)+"");
-//            if (savedInstanceState.containsKey(STATE_KEY)) {
-//                Log.d(STATE_KEY, STATE);
-//
-//            }
-//        } else {
-//            getPopularMovies();
-//        }
-
         moviesRecycle.scrollToPosition(mCurrentPostion);
 
     }
@@ -115,8 +104,8 @@ public class MainActivity extends NetworkUtils {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putString(STATE_KEY, STATE);
         mCurrentPostion = ((GridLayoutManager) (moviesRecycle.getLayoutManager())).findFirstCompletelyVisibleItemPosition();
         Log.d("save_pos", mCurrentPostion + "");
