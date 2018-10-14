@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -37,7 +38,7 @@ import example.android.com.popularmoviesappstage.R;
 import example.android.com.popularmoviesappstage.Utils.NetworkUtils;
 
 
-public class DetailsActivity extends NetworkUtils implements TrailerAdapter.TrailerClickListener {
+public class DetailsActivity extends AppCompatActivity implements TrailerAdapter.TrailerClickListener {
 
     public static final String RESULTS = "results";
     public static final String KEY = "key";
@@ -66,6 +67,8 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
     @BindView(R.id.reviewsReycle)
     RecyclerView reviewsReycle;
 
+    NetworkUtils networkUtils;
+
     Movie movie;
     MovieViewModel movieViewModel;
 
@@ -78,6 +81,8 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        networkUtils = new NetworkUtils(this);
 
         movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
@@ -110,7 +115,10 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
     }
 
     private void loadMovieData(Movie movie) {
-        Picasso.get().load(movie.getImage()).into(movie_image);
+        Picasso.get().load(movie.getImage())
+                .placeholder(R.drawable.ic_image_placeholder_24dp)
+                .error(R.drawable.ic_error_black_24dp)
+                .into(movie_image);
         original_text.setText(movie.getOriginal_title());
         overview.setText(movie.getOverview());
         date.append(movie.getRelease_date());
@@ -121,7 +129,7 @@ public class DetailsActivity extends NetworkUtils implements TrailerAdapter.Trai
         }else {
             addToFav.setImageResource(R.drawable.ic_star_black_24dp);
         }
-        if (isOnline()) {
+        if (networkUtils.isOnline()) {
             new TrailerAsyncTask().execute(id + "");
             new ReviewAsyncTask().execute(id + "");
         } else {

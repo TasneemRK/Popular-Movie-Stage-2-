@@ -14,9 +14,9 @@ import example.android.com.popularmoviesappstage.R;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerViewHolder>{
 
-    Context context;
-    List<String> stringList;
-    TrailerClickListener clickListener;
+    private Context context;
+    private List<String> stringList;
+    private TrailerClickListener clickListener;
 
 
     public TrailerAdapter(Context context, List<String> stringList,TrailerClickListener clickListener) {

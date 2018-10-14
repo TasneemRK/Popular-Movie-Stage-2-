@@ -4,9 +4,9 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -32,7 +32,7 @@ import example.android.com.popularmoviesappstage.R;
 import example.android.com.popularmoviesappstage.Utils.Constant;
 import example.android.com.popularmoviesappstage.Utils.NetworkUtils;
 
-public class MainActivity extends NetworkUtils {
+public class MainActivity extends AppCompatActivity {
 
     public static final String RESULT_JSON = "results";
     public static final String ID_JSON = "id";
@@ -52,12 +52,13 @@ public class MainActivity extends NetworkUtils {
     private static final String SCROLL_POSITION_KEY = "scroll_position";
     private static int mCurrentPostion = 0;
 
-    List<Movie> moviesList = new ArrayList<>();
     MoviesAdapter adapter;
     ActionBar actionBar;
 
     @BindView(R.id.moviesRecycleView)
     RecyclerView moviesRecycle;
+
+    NetworkUtils networkUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,8 @@ public class MainActivity extends NetworkUtils {
         setContentView(R.layout.activity_main);
 
         actionBar = getSupportActionBar();
+
+        networkUtils = new NetworkUtils(this);
 
         ButterKnife.bind(this);
         SetupRecycle();
@@ -150,7 +153,7 @@ public class MainActivity extends NetworkUtils {
 
     private void getHighestRateMovies() {
         STATE = HIGHEST;
-        if (isOnline()) {
+        if (networkUtils.isOnline()) {
             new GetMoviesAsyncTask().execute(Constant.SORT_BY_TOP_RATES_API);
             adapter.notifyDataSetChanged();
             actionBar.setTitle(R.string.highestSort);
@@ -161,7 +164,7 @@ public class MainActivity extends NetworkUtils {
 
     private void getPopularMovies() {
         STATE = POPOLAR;
-        if (isOnline()) {
+        if (networkUtils.isOnline()) {
             new GetMoviesAsyncTask().execute(Constant.SORT_BY_POPULARITY_API);
             adapter.notifyDataSetChanged();
             actionBar.setTitle(R.string.popularSort);
@@ -183,9 +186,9 @@ public class MainActivity extends NetworkUtils {
 
             List<Movie> movies = new ArrayList<>();
 
-            URL url = buildUrl(strings[0]);
+            URL url = networkUtils.buildUrl(strings[0]);
             try {
-                String result = getResponseFromHttpUrl(url);
+                String result = networkUtils.getResponseFromHttpUrl(url);
                 JSONObject jsonObject = new JSONObject(result);
                 JSONArray resultsArray = jsonObject.getJSONArray(RESULT_JSON);
                 for (int i = 0; i < resultsArray.length(); i++) {
@@ -230,7 +233,6 @@ public class MainActivity extends NetworkUtils {
         protected void onPostExecute(List<Movie> movies1) {
             adapter.setMoviesList(movies1);
         }
-
 
     }
 }

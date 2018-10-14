@@ -15,8 +15,8 @@ import example.android.com.popularmoviesappstage.R;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>{
 
-    Context context;
-    List<Review> reviewList;
+    private Context context;
+    private List<Review> reviewList;
 
     public ReviewAdapter(Context context, List<Review> reviewList) {
         this.context = context;

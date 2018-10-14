@@ -20,8 +20,8 @@ import example.android.com.popularmoviesappstage.R;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.movieViewHolder> {
 
-    Context context;
-    List<Movie> movies;
+    private Context context;
+    private List<Movie> movies;
     public static final String MOVIE_OBJECT = "movie_object";
 
     public MoviesAdapter(Context context) {

@@ -14,7 +14,16 @@ import java.net.URL;
 import java.util.Scanner;
 
 
-public class NetworkUtils extends AppCompatActivity {
+public final class  NetworkUtils  {
+
+    private Context context;
+
+    private NetworkUtils() {
+    }
+
+    public NetworkUtils(Context context) {
+        this.context = context;
+    }
 
     public static URL buildUrl(String urlString) {
         Uri builtUri = Uri.parse(urlString);
@@ -82,7 +91,7 @@ public class NetworkUtils extends AppCompatActivity {
     }
 
     public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnected();
     }

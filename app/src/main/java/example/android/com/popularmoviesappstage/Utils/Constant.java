@@ -5,9 +5,9 @@ import example.android.com.popularmoviesappstage.BuildConfig;
 public interface Constant {
 
     String apiKey = BuildConfig.ApiKey;
-    final String BASE_URL = "https://api.themoviedb.org/3/";
-    final String API_KEY = "?api_key=" + apiKey;
-//    public static final String API_VERSION = "3";
+    String BASE_URL = "https://api.themoviedb.org/3/";
+    String API_KEY = "?api_key=" + apiKey;
+    //    public static final String API_VERSION = "3";
     public static final String API_KEY1 = "api_key";
     public static final String VIDEOS = "videos";
     public static final String MOVIE = "movie";
