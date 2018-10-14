@@ -4,6 +4,8 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -43,14 +45,18 @@ public class MainActivity extends AppCompatActivity {
     public static final String RATING_JSON = "vote_average";
     public static final int GRID_SPANCOUNT = 2;
 
+    public static String PARCABLE_KEY = "PARCABLE_KEY";
+    public static String Position_KEY = "Position_KEY";
     public static String STATE_KEY = "STATE_KEY";
     public static final String POPOLAR = "popular";
     public static final String HIGHEST = "highest";
     public static final String FAVO = "favourite";
     public static String STATE = POPOLAR;
 
-    private static final String SCROLL_POSITION_KEY = "scroll_position";
-    private static int mCurrentPostion = 0;
+    public static int position = 0;
+
+    private GridLayoutManager layoutManager;
+    private Parcelable parcelable;
 
     MoviesAdapter adapter;
     ActionBar actionBar;
@@ -70,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         networkUtils = new NetworkUtils(this);
 
         ButterKnife.bind(this);
+
         SetupRecycle();
         if (STATE .equals(POPOLAR)) {
             getPopularMovies();
@@ -78,8 +85,6 @@ public class MainActivity extends AppCompatActivity {
         } else if (STATE.equals(FAVO)) {
             getFavouriteMovies();
         }
-
-        moviesRecycle.scrollToPosition(mCurrentPostion);
 
     }
 
@@ -94,12 +99,18 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.popular_sort:
+                adapter.reset();
+                position = 0;
                 getPopularMovies();
                 break;
             case R.id.highestRate_sort:
+                adapter.reset();
+                position = 0;
                 getHighestRateMovies();
                 break;
             case R.id.favourite:
+                adapter.reset();
+                position = 0;
                 getFavouriteMovies();
                 break;
         }
@@ -110,25 +121,31 @@ public class MainActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_KEY, STATE);
-        mCurrentPostion = ((GridLayoutManager) (moviesRecycle.getLayoutManager())).findFirstCompletelyVisibleItemPosition();
-        Log.d("save_pos", mCurrentPostion + "");
-        outState.putInt(SCROLL_POSITION_KEY, mCurrentPostion);
-
-
+        outState.putParcelable(PARCABLE_KEY,layoutManager.onSaveInstanceState());
+        outState.putInt(Position_KEY,layoutManager.findFirstVisibleItemPosition());
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle state) {
         super.onRestoreInstanceState(state);
-        mCurrentPostion = state.getInt(SCROLL_POSITION_KEY);
         STATE = state.getString(STATE_KEY);
+        parcelable = state.getParcelable(PARCABLE_KEY);
+        position = state.getInt(Position_KEY);
     }
 
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (parcelable != null){
+            moviesRecycle.getLayoutManager().onRestoreInstanceState(parcelable);
+        }
+    }
+
     private void SetupRecycle() {
         adapter = new MoviesAdapter(this);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, GRID_SPANCOUNT);
+        layoutManager = new GridLayoutManager(this, GRID_SPANCOUNT);
         moviesRecycle.setLayoutManager(layoutManager);
         moviesRecycle.setAdapter(adapter);
         moviesRecycle.setHasFixedSize(true);
@@ -157,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
             new GetMoviesAsyncTask().execute(Constant.SORT_BY_TOP_RATES_API);
             adapter.notifyDataSetChanged();
             actionBar.setTitle(R.string.highestSort);
+            moviesRecycle.scrollToPosition(position);
         } else {
             Toast.makeText(this, "you are not connected to the internet.", Toast.LENGTH_SHORT).show();
         }
@@ -168,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
             new GetMoviesAsyncTask().execute(Constant.SORT_BY_POPULARITY_API);
             adapter.notifyDataSetChanged();
             actionBar.setTitle(R.string.popularSort);
+            moviesRecycle.scrollToPosition(position);
         } else {
             Toast.makeText(this, "you are not connected to the internet.", Toast.LENGTH_SHORT).show();
         }
