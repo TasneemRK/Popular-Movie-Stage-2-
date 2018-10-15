@@ -31,6 +31,7 @@ import example.android.com.popularmoviesappstage.AND_Arch_Comp_Database.MovieVie
 import example.android.com.popularmoviesappstage.Adapters.MoviesAdapter;
 import example.android.com.popularmoviesappstage.Models.Movie;
 import example.android.com.popularmoviesappstage.R;
+import example.android.com.popularmoviesappstage.Utils.CalNoOfColumnsAccordingToWidth;
 import example.android.com.popularmoviesappstage.Utils.Constant;
 import example.android.com.popularmoviesappstage.Utils.NetworkUtils;
 
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String OVERVIEW_JSON = "overview";
     public static final String DATE_JSON = "release_date";
     public static final String RATING_JSON = "vote_average";
-    public static final int GRID_SPANCOUNT = 2;
+    public static int GRID_SPANCOUNT ;
 
     public static String PARCABLE_KEY = "PARCABLE_KEY";
     public static String Position_KEY = "Position_KEY";
@@ -76,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
         networkUtils = new NetworkUtils(this);
 
         ButterKnife.bind(this);
+
+        CalNoOfColumnsAccordingToWidth noOfColumnsAccordingToWidth = new CalNoOfColumnsAccordingToWidth(this);
+        GRID_SPANCOUNT = noOfColumnsAccordingToWidth.calculateNoOfColumns();
 
         SetupRecycle();
         if (STATE .equals(POPOLAR)) {
@@ -251,6 +255,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<Movie> movies1) {
             adapter.setMoviesList(movies1);
+            if (parcelable != null){
+                moviesRecycle.getLayoutManager().onRestoreInstanceState(parcelable);
+            }
         }
 
     }
