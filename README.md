@@ -14,6 +14,8 @@ You’ll modify the existing sorting criteria for the main view to include an ad
 Recall from Stage 1, you built a UI that presented the user with a grid of movie posters, allowed users to change sort order, and presented a screen with additional information on the movie selected by the user:
 
 
+
+
 ## What Will I Learn After Stage 2?
 
 You will build a fully featured application that looks and feels natural on the latest Android operating system.
